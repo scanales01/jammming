@@ -78,9 +78,7 @@ class App extends React.Component {
   }
 
   savePlaylist() {
-    // const trackURIs = this.state.playlistTracks.map(track => {
-    //   track.uri
-    // });
+    const trackURIs = this.state.playlistTracks.map(track => track.uri);
   }
 
   search(term) {
@@ -99,7 +97,8 @@ class App extends React.Component {
                 playlistName={this.state.playlistName}
                 playlistTracks={this.state.playlistTracks}
                 onRemove={this.removeTrack}
-                onNameChange={this.updatePlaylistName}/>
+                onNameChange={this.updatePlaylistName}
+                onSave={this.savePlaylist}/>
            </div>
         </div>
       </div>
