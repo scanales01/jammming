@@ -14,22 +14,32 @@ authorizeURL += '&redirect_uri=' + encodeURIComponent(redirectURI);
 let accessToken
 
 const Spotify = {
+    getHashParams() {
+        const hashParams = {};
+        const r = /([^&;=]+)=?([^&*]*)/g;
+        const q = window.location.hash.substring(1);
+        let e = r.exec(q);
+        while (e) {
+            hashParams[e[1]] = decodeURIComponent(e[2]);
+            e = r.exec(q);
+        }
+        return hashParams;
+    },
+
     getAccessToken() {
         if (accessToken) {
             return accessToken;
         }
-        const urlToken = window.location.href.match(/access_token=([^&]*)/);
-        const urlExpiration = window.location.href.match(/expires_in=([^&]*)/)
-        if (urlToken && urlExpiration) {
-            accessToken = urlToken[1];
-            const expiresIn = Number(urlExpiration[1]);
+        const params = this.getHashParams();
+        if (params.access_token && params.expires_in) {
+            accessToken = params.access_token;
+            const expiresIn = Number(params.expires_in);
             window.setTimeout(() => accessToken = '', expiresIn * 1000);
             window.history.pushState('Access Token', null, '/')
             return accessToken;
         } else {
             window.location = authorizeURL;
         }
-        
     },
 
     search(term) {

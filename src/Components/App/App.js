@@ -4,49 +4,17 @@ import SearchBar from '../SearchBar/SearchBar';
 import SearchResults from '../SearchResults/SearchResults';
 import Playlist from '../Playlist/Playlist';
 import Spotify from '../../util/Spotify';
+import LogIn from '../LogIn/LogIn';
 
 
 class App extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
-      searchResults: [{
-        name: 'name0',
-        artist: 'artist0',
-        album: 'album0',
-        id: 0
-      },
-      {
-        name: 'name2',
-        artist: 'artist2',
-        album: 'album2',
-        id: 2
-      },
-      {
-        name: 'name3',
-        artist: 'artist3',
-        album: 'album3',
-        id: 3
-      }],
-      playlistName: 'Name',
-      playlistTracks: [{
-        name: 'name1',
-        artist: 'artist1',
-        album: 'album1',
-        id: 1
-      },
-      {
-        name: 'name2',
-        artist: 'artist2',
-        album: 'album2',
-        id: 2
-      },
-      {
-        name: 'name3',
-        artist: 'artist3',
-        album: 'album3',
-        id: 3
-      }]
+      searchResults: [],
+      playlistName: 'New Playlist',
+      playlistTracks: [],
+      isLoggedIn: false
     };
 
     this.addTrack = this.addTrack.bind(this);
@@ -54,6 +22,51 @@ class App extends React.Component {
     this.updatePlaylistName = this.updatePlaylistName.bind(this);
     this.savePlaylist = this.savePlaylist.bind(this);
     this.search = this.search.bind(this);
+    this.renderContent = this.renderContent.bind(this);
+  }
+
+  componentDidMount() {
+    const params = Spotify.getHashParams();
+
+    const accessToken = params.access_token;
+    
+    if (accessToken) {
+      window.localStorage.removeItem('spotifyAccessToken');
+      this.setState({ isLoggedIn: true });
+    }
+}
+
+  renderContent() {
+    let loggedIn = this.state.isLoggedIn;
+    if (loggedIn) {
+      return (
+        <div className='App'>
+          <SearchBar onSearch={this.search} />
+           <div className='App-playlist'>
+             <SearchResults
+                searchResults={this.state.searchResults} 
+                onAdd={this.addTrack}/>
+             <Playlist
+                playlistName={this.state.playlistName}
+                playlistTracks={this.state.playlistTracks}
+                onRemove={this.removeTrack}
+                onNameChange={this.updatePlaylistName}
+                onSave={this.savePlaylist}/>
+           </div>
+        </div>
+      );
+    } else {
+      return (
+        <div className='App'>
+          <LogIn 
+            onLogIn={this.logIn}/>
+        </div>
+      );
+    }
+  }
+
+  logIn() {
+    Spotify.getAccessToken();
   }
 
   addTrack(track) {
@@ -92,19 +105,7 @@ class App extends React.Component {
     return (
       <div>
         <h1>Ja<span className='highlight'>mmm</span>ing</h1>
-        <div className='App'>
-          <SearchBar onSearch={this.search} />
-           <div className='App-playlist'>
-             <SearchResults
-                searchResults={this.state.searchResults} onAdd={this.addTrack}/>
-             <Playlist
-                playlistName={this.state.playlistName}
-                playlistTracks={this.state.playlistTracks}
-                onRemove={this.removeTrack}
-                onNameChange={this.updatePlaylistName}
-                onSave={this.savePlaylist}/>
-           </div>
-        </div>
+        {this.renderContent()}
       </div>
     );
   }
