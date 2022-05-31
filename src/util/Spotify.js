@@ -1,5 +1,5 @@
 const clientID = '75e9f7e04f114b548ba8a93130720321';
-const redirectURI = 'http://localhost:3000';
+const redirectURI = 'https://jammming-ten.vercel.app';
 const scope = 'playlist-modify-public'
 
 const apiURL = 'https://api.spotify.com/v1';
